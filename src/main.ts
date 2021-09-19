@@ -2,17 +2,16 @@ import * as core from '@actions/core'
 import * as exec from '@actions/exec'
 import * as github from '@actions/github'
 // import * as octokit from '@octokit/rest'
-import {wait} from './wait'
 
-const { GITHUB_TOKEN } = process.env
+const {GITHUB_TOKEN} = process.env
 
-async function runMypy() {
+async function runMypy(): Promise<string> {
   let myOutput = ''
-  let options = {
+  const options = {
     listeners: {
       stdout: (data: Buffer) => {
         myOutput += data.toString()
-      },
+      }
     }
   }
   try {
@@ -33,17 +32,16 @@ function parseMypyOutput(output: string): Annotation[] {
   // Group 2: line number
   // Group 3: error
   // Group 4: error description
-  let regex = new RegExp(/^(.*?):(\d+): (\w\d+): ([\s|\w]*)/)
-  let errors = output.split('\n')
-  let annotations: Annotation[] = []
-  for (let i = 0; i < errors.length; i++) {
-    let error = errors[i]
-    let match = error.match(regex)
+  const regex = new RegExp(/^(.*?):(\d+): (\w\d+): ([\s|\w]*)/)
+  const errors = output.split('\n')
+  const annotations: Annotation[] = []
+  for (const error of errors) {
+    const match = error.match(regex)
     if (match) {
       // Chop `./` off the front so that Github will recognize the file path
       const normalized_path = match[1].replace('./', '')
       const line = parseInt(match[2])
-      const annotation_level = <const> 'failure'
+      const annotation_level = <const>'failure'
       const annotation = {
         path: normalized_path,
         start_line: line,
@@ -51,7 +49,7 @@ function parseMypyOutput(output: string): Annotation[] {
         // start_column: column,
         // end_column: column,
         annotation_level,
-        message: `[${match[3]}] ${match[4]}`,
+        message: `[${match[3]}] ${match[4]}`
       }
 
       annotations.push(annotation)
@@ -60,7 +58,11 @@ function parseMypyOutput(output: string): Annotation[] {
   return annotations
 }
 
-async function createCheck(check_name: string, title: string, annotations: Annotation[]) {
+async function createCheck(
+  check_name: string,
+  title: string,
+  annotations: Annotation[]
+): Promise<void> {
   const octokit = github.getOctokit(String(GITHUB_TOKEN))
   const res = await octokit.rest.checks.listForRef({
     check_name,
@@ -86,13 +88,11 @@ async function run(): Promise<void> {
     const mypyOutput = await runMypy()
     const annotations = parseMypyOutput(mypyOutput)
     if (annotations.length > 0) {
-      console.log(annotations)
       const checkName = core.getInput('checkName')
-      await createCheck(checkName, "mypy failure", annotations)
+      await createCheck(checkName, 'mypy failure', annotations)
       core.setFailed(`${annotations.length} errors(s) found`)
     }
-  }
-  catch (error: any) {
+  } catch (error: any) {
     core.setFailed(error.message)
   }
 }
