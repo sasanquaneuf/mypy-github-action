@@ -2,9 +2,9 @@
   <a href="https://github.com/actions/typescript-action/actions"><img alt="typescript-action status" src="https://github.com/actions/typescript-action/workflows/build-test/badge.svg"></a>
 </p>
 
-# `mypy` Github Action
+# `mypy` GitHub Action
 
-This is a Github Action to run `mypy` against your repository. It uses the new Github Actions API and JavaScript toolkit. It does fancy things like add annotations to your PRs inline.
+This is a GitHub Action to run `mypy` against your repository. It uses the new GitHub Actions API and JavaScript toolkit. It does fancy things like add annotations to your PRs inline.
 
 (image)
 
@@ -39,3 +39,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 ```
+
+# Acknowledgments
+
+This GitHub Action was made with reference to [flake8-github-action](https://github.com/suo/flake8-github-action)
