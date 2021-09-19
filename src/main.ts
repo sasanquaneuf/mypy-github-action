@@ -32,7 +32,7 @@ function parseMypyOutput(output: string): Annotation[] {
   // Group 2: line number
   // Group 3: error
   // Group 4: error description
-  const regex = new RegExp(/^(.*?):(\d+): (\w\d+): ([\s|\w]*)/)
+  const regex = new RegExp(/^(.*?):(\d+): (.+): ([\s|\w]*)/)
   const errors = output.split('\n')
   const annotations: Annotation[] = []
   for (const error of errors) {
