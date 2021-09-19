@@ -1,11 +1,14 @@
-name: 'Your name here'
-description: 'Provide a description here'
-author: 'Your name or organization here'
+name: 'Mypy action'
+description: 'Run flake8 and annotate the results'
+author: 'sasanquaneuf'
+branding:
+  icon: check-circle
+  color: yellow
 inputs:
-  milliseconds: # change this
+  checkName:
+    description: 'The name of the check to add annotations to.
+      Generally the same as the job that uses this action'
     required: true
-    description: 'input description here'
-    default: 'default value if applicable'
 runs:
   using: 'node12'
   main: 'dist/index.js'
