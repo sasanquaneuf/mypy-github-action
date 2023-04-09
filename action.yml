@@ -9,6 +9,14 @@ inputs:
     description: 'The name of the check to add annotations to.
       Generally the same as the job that uses this action'
     required: true
+  command:
+    description: "MyPy command to run."
+    required: false
+    default: "mypy ."
+  args:
+    description: "Additional CLI arguments passed to MyPy."
+    required: false
+
 runs:
   using: 'node16'
   main: 'dist/index.js'

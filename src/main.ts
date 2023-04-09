@@ -5,7 +5,7 @@ import * as github from '@actions/github'
 
 const {GITHUB_TOKEN} = process.env
 
-async function runMypy(): Promise<string> {
+async function runMypy(cmd: string, args: string[]): Promise<string> {
   let myOutput = ''
   const options = {
     listeners: {
@@ -15,7 +15,7 @@ async function runMypy(): Promise<string> {
     }
   }
   try {
-    await exec.exec('mypy .', [], options)
+    await exec.exec(cmd, args, options)
     myOutput = ''
   } catch (error: any) {
     core.debug(error)
@@ -23,10 +23,17 @@ async function runMypy(): Promise<string> {
   return myOutput
 }
 
-// type Annotation = octokit.ChecksUpdateParamsOutputAnnotations
-type Annotation = any
+interface Annotation {
+  path: string
+  start_line: number
+  end_line: number
+  // start_column: number
+  // end_column: number
+  annotation_level: string
+  message: string
+}
 // Regex the output for error lines, then format them in
-function parseMypyOutput(output: string): Annotation[] {
+export function parseMypyOutput(output: string): Annotation[] {
   // Group 0: whole match
   // Group 1: filename
   // Group 2: line number
@@ -70,7 +77,7 @@ async function createCheck(
     ref: github.context.sha
   })
 
-  const check_run_id = res.data.check_runs[0].id
+  const check_run_id = res.data.check_runs[0]?.id
 
   await octokit.rest.checks.update({
     ...github.context.repo,
@@ -85,7 +92,9 @@ async function createCheck(
 
 async function run(): Promise<void> {
   try {
-    const mypyOutput = await runMypy()
+    const cmd = core.getInput('command')
+    const args = core.getInput('args').split(' ')
+    const mypyOutput = await runMypy(cmd, args)
     const annotations = parseMypyOutput(mypyOutput)
     if (annotations.length > 0) {
       const checkName = core.getInput('checkName')
