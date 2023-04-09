@@ -1,7 +1,5 @@
 import * as process from 'process'
-import * as cp from 'child_process'
-import * as path from 'path'
-import {test, expect, describe, beforeAll, it, afterAll} from '@jest/globals'
+import {expect, describe, beforeAll, it, afterAll} from '@jest/globals'
 import * as mypy_action from '../src/mypy-action'
 
 const TOX_RUN_OUTPUT =
@@ -73,7 +71,7 @@ const RAW_OUTPUT =
 
 async function NoopVerify(arg: string): Promise<void> {}
 
-let otherFnOrig: any
+let otherFnOrig: Function
 
 beforeAll(() => {
   otherFnOrig = mypy_action.verifyCheckNameIsProvidedCorrectly
@@ -99,14 +97,4 @@ describe('test action', () => {
     const result = mypy_action.parseMypyOutput(TOX_RUN_OUTPUT)
     expect(result.length).toBe(15)
   })
-})
-
-// shows how the runner will run a javascript action with env / stdout protocol
-test('test runs', () => {
-  const np = process.execPath
-  const ip = path.join(__dirname, '..', 'lib', 'main.js')
-  const options: cp.ExecFileSyncOptions = {
-    env: process.env
-  }
-  console.log(cp.execFileSync(np, [ip], options).toString())
 })

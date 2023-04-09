@@ -27,12 +27,12 @@ export async function runMypy(cmd: string, args: string[]): Promise<string> {
   } catch (error: any) {
     core.debug(error)
   }
+  core.info(`MyPy output: ${myOutput}`)
   return myOutput
 }
 
 // Regex the output for error lines, then format them in
 export function parseMypyOutput(output: string): Annotation[] {
-  // Line looks like this noisegrad/utils.py:11: error: Missing return statement  [return]
   const errors = output.split('\n')
   const annotations: Annotation[] = []
   for (const error of errors) {

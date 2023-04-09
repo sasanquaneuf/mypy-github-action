@@ -130,13 +130,13 @@ function runMypy(cmd, args) {
         catch (error) {
             core.debug(error);
         }
+        core.info(`MyPy output: ${myOutput}`);
         return myOutput;
     });
 }
 exports.runMypy = runMypy;
 // Regex the output for error lines, then format them in
 function parseMypyOutput(output) {
-    // Line looks like this noisegrad/utils.py:11: error: Missing return statement  [return]
     const errors = output.split('\n');
     const annotations = [];
     for (const error of errors) {
