@@ -32,21 +32,22 @@ export async function runMypy(cmd: string, args: string[]): Promise<string> {
 
 // Regex the output for error lines, then format them in
 export function parseMypyOutput(output: string): Annotation[] {
-  // Group 0: whole match
-  // Group 1: filename
-  // Group 2: line number
-  // Group 3: error
-  // Group 4: error description
-  const regex = new RegExp(/^(.*?):(\d+): (.+): ([\s|\w]*)/)
+  // Line looks like this noisegrad/utils.py:11: error: Missing return statement  [return]
   const errors = output.split('\n')
   const annotations: Annotation[] = []
   for (const error of errors) {
-    const match = error.match(regex)
-    if (match) {
+    if (error) {
+      let details = error.split(':')
+      details = details.map(i => i.trim())
+      if (details.length < 4 || details[2] !== 'error') {
+        continue
+      }
       // Chop `./` off the front so that Github will recognize the file path
-      const normalized_path = match[1].replace('./', '')
-      const line = parseInt(match[2])
+      const normalized_path = details[0].replace('./', '')
+      const line = parseInt(details[1])
       const annotation_level = <const>'failure'
+      let message = details[3]
+      message = message.slice(0, message.indexOf('[') - 1)
       const annotation = {
         path: normalized_path,
         start_line: line,
@@ -54,7 +55,7 @@ export function parseMypyOutput(output: string): Annotation[] {
         // start_column: column,
         // end_column: column,
         annotation_level,
-        message: `[${match[3]}] ${match[4]}`
+        message
       }
 
       annotations.push(annotation)

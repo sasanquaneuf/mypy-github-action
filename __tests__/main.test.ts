@@ -92,12 +92,12 @@ afterAll(() => {
 describe('test action', () => {
   it('test raw output', () => {
     const result = mypy_action.parseMypyOutput(RAW_OUTPUT)
-    expect(result.length).toBe(26)
+    expect(result.length).toBe(15)
   })
 
   it('test tox output', () => {
     const result = mypy_action.parseMypyOutput(TOX_RUN_OUTPUT)
-    expect(result.length).toBe(26)
+    expect(result.length).toBe(15)
   })
 })
 
