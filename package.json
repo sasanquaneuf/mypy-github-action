@@ -1,6 +1,6 @@
 {
   "name": "typescript-action",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "private": true,
   "description": "TypeScript template action",
   "main": "lib/main.js",
@@ -15,7 +15,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/actions/typescript-action.git"
+    "url": "https://github.com/sasanquaneuf/mypy-github-action"
   },
   "keywords": [
     "actions",
@@ -28,8 +28,7 @@
     "@actions/core": "^1.10.0",
     "@actions/exec": "^1.1.1",
     "@actions/github": "^5.1.1",
-    "@octokit/rest": "^19.0.5",
-    "@octokit/types": "^9.0.0"
+    "@octokit/rest": "^19.0.5"
   },
   "devDependencies": {
     "@types/node": "^18.11.10",
@@ -42,6 +41,7 @@
     "js-yaml": "^4.1.0",
     "prettier": "2.8.0",
     "ts-jest": "^27.1.4",
-    "typescript": "^4.9.5"
+    "typescript": "^4.9.5",
+    "@octokit/types": "^9.0.0"
   }
 }

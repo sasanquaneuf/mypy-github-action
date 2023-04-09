@@ -1,8 +1,8 @@
 import * as process from 'process'
 import * as cp from 'child_process'
 import * as path from 'path'
-import {test, expect} from '@jest/globals'
-import {parseMypyOutput} from '../src/main'
+import {test, expect, describe, beforeAll, it, afterAll} from '@jest/globals'
+import * as mypy_action from '../src/mypy-action'
 
 const TOX_RUN_OUTPUT =
   "type: install_deps> python -I -m pip install 'captum>=0.6' datasets matplotlib mypy pytest 'torch>=1.13.1' 'torchvision>=0.14.1' tqdm 'transformers>=4.26'\n" +
@@ -71,19 +71,38 @@ const RAW_OUTPUT =
   'noisegrad/explainers.py:53: note: Perhaps you need "Callable[...]" or a callback protocol?\n' +
   'Found 15 errors in 3 files (checked 7 source files)\n'
 
-test('test raw output', () => {
-  const result = parseMypyOutput(RAW_OUTPUT)
-  expect(result.length).toBe(26)
+async function NoopVerify(arg: string): Promise<void> {}
+
+let otherFnOrig: any
+
+beforeAll(() => {
+  otherFnOrig = mypy_action.verifyCheckNameIsProvidedCorrectly
+  // @ts-ignore
+  mypy_action.verifyCheckNameIsProvidedCorrectly = NoopVerify
+  process.env['GITHUB_TOKEN'] = 'bla'
 })
 
-test('test tox output', () => {
-  const result = parseMypyOutput(TOX_RUN_OUTPUT)
-  expect(result.length).toBe(26)
+afterAll(() => {
+  // @ts-ignore
+  mypy_action.verifyCheckNameIsProvidedCorrectly = otherFnOrig
+  delete process.env['GITHUB_TOKEN']
+})
+// process.env['INPUT_MILLISECONDS'] = '500'
+
+describe('test action', () => {
+  it('test raw output', () => {
+    const result = mypy_action.parseMypyOutput(RAW_OUTPUT)
+    expect(result.length).toBe(26)
+  })
+
+  it('test tox output', () => {
+    const result = mypy_action.parseMypyOutput(TOX_RUN_OUTPUT)
+    expect(result.length).toBe(26)
+  })
 })
 
 // shows how the runner will run a javascript action with env / stdout protocol
 test('test runs', () => {
-  // process.env['INPUT_MILLISECONDS'] = '500'
   const np = process.execPath
   const ip = path.join(__dirname, '..', 'lib', 'main.js')
   const options: cp.ExecFileSyncOptions = {

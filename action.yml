@@ -9,7 +9,7 @@ inputs:
     description: 'The name of the check to add annotations to.
       Generally the same as the job that uses this action'
     required: true
-  command:
+  cmd:
     description: "MyPy command to run."
     required: false
     default: "mypy ."
