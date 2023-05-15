@@ -1,5 +1,5 @@
 <p align="center">
-  <a href="https://github.com/actions/typescript-action/actions"><img alt="typescript-action status" src="https://github.com/actions/typescript-action/workflows/build-test/badge.svg"></a>
+  <a href="https://github.com/sasanquaneuf/mypy-github-action/actions"><img alt="mypy-github-action status" src="https://github.com/sasanquaneuf/mypy-github-action/workflows/build-test/badge.svg"></a>
 </p>
 
 # `mypy` GitHub Action
@@ -24,12 +24,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Setup Python
-        uses: actions/setup-python@v1
+        uses: actions/setup-python@v4
         with:
           python-version: 3.7.4
           architecture: x64
       - name: Checkout
-        uses: actions/checkout@v1
+        uses: actions/checkout@v3
       - name: Install mypy
         run: pip install mypy
       - name: Run mypy
