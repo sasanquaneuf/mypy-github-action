@@ -10,5 +10,5 @@ inputs:
       Generally the same as the job that uses this action'
     required: true
 runs:
-  using: 'node16'
+  using: 'node20'
   main: 'dist/index.js'
