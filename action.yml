@@ -1,6 +1,6 @@
 name: 'Mypy action'
-description: 'Run flake8 and annotate the results'
-author: 'sasanquaneuf'
+description: 'Run mypy and annotate the results'
+author: 'amilcarlucas'
 branding:
   icon: check-circle
   color: yellow
@@ -9,6 +9,14 @@ inputs:
     description: 'The name of the check to add annotations to.
       Generally the same as the job that uses this action'
     required: true
+  mypyFlags:
+    description: 'Additional flags to pass to mypy'
+    required: false
+    default: ''
+  mypyFiles:
+    description: 'Files on which to run mypy (default runs on full project)'
+    required: false
+    default: '.'
 runs:
   using: 'node20'
   main: 'dist/index.js'

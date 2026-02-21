@@ -5,26 +5,38 @@ import * as github from '@actions/github'
 
 const {GITHUB_TOKEN} = process.env
 
-async function runMypy(): Promise<string> {
-  let myOutput = ''
+async function runMypy(mypyFlags: string, mypyFiles: string): Promise<string> {
+  let mypyOutput = ''
   const options = {
     listeners: {
       stdout: (data: Buffer) => {
-        myOutput += data.toString()
+        mypyOutput += data.toString()
+      },
+      stderr: (data: Buffer) => {
+        mypyOutput += data.toString()
       }
     }
   }
   try {
-    await exec.exec('mypy .', [], options)
-    myOutput = ''
-  } catch (error: any) {
-    core.debug(error)
+    await exec.exec(['mypy', mypyFlags, mypyFiles].join(' '), [], options)
+  } catch (error: unknown) {
+    if (error instanceof Error) {
+      core.debug(error.message)
+    } else {
+      core.debug(String(error))
+    }
   }
-  return myOutput
+  return mypyOutput
 }
 
 // type Annotation = octokit.ChecksUpdateParamsOutputAnnotations
-type Annotation = any
+type Annotation = {
+  path: string
+  start_line: number
+  end_line: number
+  annotation_level: 'failure'
+  message: string
+}
 // Regex the output for error lines, then format them in
 function parseMypyOutput(output: string): Annotation[] {
   // Group 0: whole match
@@ -85,15 +97,21 @@ async function createCheck(
 
 async function run(): Promise<void> {
   try {
-    const mypyOutput = await runMypy()
+    const mypyFlags = core.getInput('mypyFlags')
+    const mypyFiles = core.getInput('mypyFiles')
+    const mypyOutput = await runMypy(mypyFlags, mypyFiles)
     const annotations = parseMypyOutput(mypyOutput)
     if (annotations.length > 0) {
       const checkName = core.getInput('checkName')
       await createCheck(checkName, 'mypy failure', annotations)
       core.setFailed(`${annotations.length} errors(s) found`)
     }
-  } catch (error: any) {
-    core.setFailed(error.message)
+  } catch (error: unknown) {
+    if (error instanceof Error) {
+      core.debug(error.message)
+    } else {
+      core.debug(String(error))
+    }
   }
 }
 
